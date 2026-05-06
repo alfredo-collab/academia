@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f0f7f0">
+<title>AcademIA</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Poppins', system-ui, sans-serif; background: #f0f7f0; min-height: 100vh; display: flex; justify-content: center; }
+  .app { width: 100%; max-width: 480px; min-height: 100vh; background: #f0f7f0; position: relative; overflow-x: hidden; }
+
+  /* SCREENS */
+  .screen { display: none; padding: 24px 16px 32px; min-height: 100vh; }
+  .screen.active { display: block; }
+
+  /* HOME */
+  #home { background: linear-gradient(160deg, #e8f5e9 0%, #f0f7f0 60%); }
+  .home-top { text-align: center; padding-top: 32px; margin-bottom: 8px; }
+  .logo { font-size: 36px; font-weight: 700; color: #1a2e1a; letter-spacing: -1px; line-height: 1; }
+  .logo-ia { background: #5a9e6f; color: white; border-radius: 10px; padding: 2px 10px; font-weight: 700; display: inline-block; }
+  .home-date { text-align: center; font-size: 13px; color: #4a6b4a; margin: 10px 0 20px; font-weight: 400; }
+  .dias-wrap { display: flex; justify-content: center; margin-bottom: 28px; }
+  .dias-badge { background: white; border: 0.5px solid #c8e6c9; border-radius: 99px; padding: 8px 20px; font-size: 14px; color: #5a9e6f; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 4px rgba(90,158,111,0.08); }
+  .treino-row { display: flex; gap: 12px; margin-bottom: 14px; }
+  .btn-treino { flex: 1; background: #5a9e6f; color: white; border: none; border-radius: 20px; padding: 18px 10px 14px; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(90,158,111,0.22); transition: transform 0.15s, box-shadow 0.15s; }
+  .btn-treino:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(90,158,111,0.18); }
+  .btn-treino .dot-wrap { height: 12px; display: flex; justify-content: center; align-items: center; margin-bottom: 6px; }
+  .btn-treino .dot { width: 7px; height: 7px; background: white; border-radius: 50%; opacity: 0; }
+  .btn-treino.suggested .dot { opacity: 1; }
+  .btn-treino .label { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+  .btn-treino .sub { font-size: 10px; color: rgba(255,255,255,0.75); margin-top: 5px; font-weight: 400; }
+  .btn-stats { width: 100%; background: white; color: #5a9e6f; border: 0.5px solid #c8e6c9; border-radius: 14px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; transition: background 0.15s; }
+  .btn-stats:active { background: #f0f7f0; }
+
+  /* CHECKLIST */
+  .cl-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-top: 8px; }
+  .back-btn { background: white; border: 0.5px solid #c8e6c9; border-radius: 12px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #4a6b4a; font-size: 16px; flex-shrink: 0; }
+  .cl-title { font-size: 22px; font-weight: 700; color: #1a2e1a; }
+  .prog-wrap { margin-bottom: 18px; }
+  .prog-bar { background: #c8e6c9; border-radius: 99px; height: 5px; margin-bottom: 6px; overflow: hidden; }
+  .prog-fill { background: #5a9e6f; border-radius: 99px; height: 5px; transition: width 0.35s ease; }
+  .prog-info { display: flex; justify-content: space-between; font-size: 11px; color: #4a6b4a; font-weight: 500; }
+  .ex-card { background: white; border: 0.5px solid #c8e6c9; border-radius: 16px; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 11px; cursor: pointer; transition: background 0.2s, border-color 0.2s; user-select: none; }
+  .ex-card.done { background: #d4edda; border-color: #5a9e6f; }
+  .ex-num { font-size: 10px; font-weight: 700; color: #5a9e6f; background: #e8f5e9; border-radius: 99px; width: 18px; height: 18px; min-width: 18px; display: flex; align-items: center; justify-content: center; align-self: flex-start; margin-top: 3px; }
+  .ex-card.done .ex-num { background: #b8dfc4; color: #3d7a52; }
+  .icon-wrap { width: 44px; height: 44px; min-width: 44px; background: #e8f5e9; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .ex-card.done .icon-wrap { background: #b8dfc4; }
+  .ex-info { flex: 1; min-width: 0; }
+  .ex-cat { font-size: 9px; color: #4a6b4a; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 2px; }
+  .ex-name { font-size: 13px; font-weight: 600; color: #1a2e1a; line-height: 1.3; }
+  .ex-detail { font-size: 11px; color: #4a6b4a; margin-top: 2px; font-weight: 400; }
+  .ex-rest { font-size: 10px; color: #5a9e6f; font-weight: 600; margin-top: 2px; }
+  .ex-check { width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 1.5px solid #c8e6c9; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.2s; }
+  .ex-card.done .ex-check { background: #5a9e6f; border-color: #5a9e6f; color: white; }
+  .btn-concluir { width: 100%; background: #5a9e6f; color: white; border: none; border-radius: 16px; padding: 15px; font-size: 15px; font-weight: 700; margin-top: 10px; cursor: pointer; font-family: 'Poppins', sans-serif; display: none; box-shadow: 0 4px 12px rgba(90,158,111,0.25); letter-spacing: 0.5px; transition: transform 0.15s; }
+  .btn-concluir.visible { display: block; }
+  .btn-concluir:active { transform: scale(0.98); }
+
+  /* STATS */
+  .stats-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-top: 8px; }
+  .stats-title { font-size: 20px; font-weight: 700; color: #1a2e1a; }
+  .stats-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: white; border: 0.5px solid #c8e6c9; border-radius: 14px; padding: 14px; }
+  .stat-card.full { grid-column: 1 / -1; }
+  .stat-label { font-size: 11px; color: #4a6b4a; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: #1a2e1a; line-height: 1; }
+  .stat-unit { font-size: 13px; color: #4a6b4a; font-weight: 400; }
+  .section-title { font-size: 13px; font-weight: 700; color: #1a2e1a; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .semanas-table { background: white; border: 0.5px solid #c8e6c9; border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
+  .semanas-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .semanas-table th { background: #e8f5e9; color: #4a6b4a; font-weight: 600; padding: 10px 12px; text-align: left; }
+  .semanas-table td { padding: 10px 12px; color: #1a2e1a; border-top: 0.5px solid #c8e6c9; }
+  .historico { background: white; border: 0.5px solid #c8e6c9; border-radius: 14px; overflow: hidden; }
+  .hist-item { padding: 12px 14px; border-bottom: 0.5px solid #e8f5e9; display: flex; align-items: center; justify-content: space-between; }
+  .hist-item:last-child { border-bottom: none; }
+  .hist-date { font-size: 12px; color: #4a6b4a; }
+  .hist-badge { background: #5a9e6f; color: white; border-radius: 8px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+  .hist-detail { font-size: 11px; color: #4a6b4a; text-align: right; }
+  .empty-state { text-align: center; padding: 32px 16px; color: #4a6b4a; font-size: 14px; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a2e1a; color: white; border-radius: 12px; padding: 12px 24px; font-size: 14px; font-weight: 600; font-family: 'Poppins', sans-serif; transition: transform 0.35s ease; z-index: 999; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TELA PRINCIPAL -->
+  <div class="screen active" id="home">
+    <div class="home-top">
+      <div class="logo">Academ<span class="logo-ia">IA</span></div>
+    </div>
+    <div class="home-date" id="home-date"></div>
+    <div class="dias-wrap">
+      <div class="dias-badge">💪 <span id="dias-count">0</span> dias esse mês</div>
+    </div>
+    <div class="treino-row">
+      <button class="btn-treino" id="btn-a" onclick="showChecklist('A')">
+        <div class="dot-wrap"><div class="dot"></div></div>
+        <div class="label">TREINO A</div>
+        <div class="sub">Peito · Tríceps · Pernas</div>
+      </button>
+      <button class="btn-treino" id="btn-b" onclick="showChecklist('B')">
+        <div class="dot-wrap"><div class="dot"></div></div>
+        <div class="label">TREINO B</div>
+        <div class="sub">Costas · Bíceps · Ombro</div>
+      </button>
+    </div>
+    <button class="btn-stats" onclick="showStats()">📊 Ver Estatísticas</button>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="screen" id="checklist">
+    <div class="cl-header">
+      <div class="back-btn" onclick="showHome()">←</div>
+      <div class="cl-title" id="cl-title">Treino A</div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="prog-info">
+        <span id="prog-text">0 de 8 exercícios</span>
+        <span id="prog-pct">0%</span>
+      </div>
+    </div>
+    <div id="exercise-list"></div>
+    <button class="btn-concluir" id="btn-concluir" onclick="concluirTreino()">✓ CONCLUIR TREINO</button>
+  </div>
+
+  <!-- ESTATÍSTICAS -->
+  <div class="screen" id="stats">
+    <div class="stats-header">
+      <div class="back-btn" onclick="showHome()">←</div>
+      <div class="stats-title" id="stats-title">Estatísticas</div>
+    </div>
+    <div class="stats-cards">
+      <div class="stat-card">
+        <div class="stat-label">Dias treinados</div>
+        <div class="stat-value" id="s-dias">0</div>
+        <div class="stat-unit">esse mês</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Exercícios</div>
+        <div class="stat-value" id="s-exs">0</div>
+        <div class="stat-unit">realizados</div>
+      </div>
+      <div class="stat-card full">
+        <div class="stat-label">Total de repetições</div>
+        <div class="stat-value" id="s-reps">0</div>
+        <div class="stat-unit">repetições no mês</div>
+      </div>
+    </div>
+    <div class="section-title">Semana a semana</div>
+    <div class="semanas-table">
+      <table>
+        <thead><tr><th>Semana</th><th>Treinos</th><th>Exercícios</th></tr></thead>
+        <tbody id="semanas-body"></tbody>
+      </table>
+    </div>
+    <div class="section-title">Histórico</div>
+    <div class="historico" id="historico"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ─── ÍCONES SVG ───────────────────────────────────────────────
+const IC = {
+  perna: `<svg width="26" height="26" viewBox="0 0 256 256" fill="none" stroke="#5a9e6f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="80" cy="48" r="24"/>
+    <path d="M80 72 L80 152 L172 152"/>
+    <path d="M172 152 L216 214"/>
+    <rect x="200" y="200" width="36" height="22" rx="8"/>
+  </svg>`,
+  agacha: `<svg width="26" height="26" viewBox="0 0 256 256" fill="none" stroke="#5a9e6f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="128" cy="40" r="22"/>
+    <path d="M128 62 L128 140 L82 208"/>
+    <path d="M128 140 L174 208"/>
+    <path d="M96 118 L48 94"/>
+    <path d="M160 118 L208 94"/>
+  </svg>`,
+  barra: `<svg width="26" height="26" viewBox="0 0 256 256" fill="none" stroke="#5a9e6f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="76" y1="128" x2="180" y2="128"/>
+    <rect x="20" y="108" width="28" height="40" rx="6"/>
+    <rect x="48" y="96" width="20" height="64" rx="5"/>
+    <rect x="208" y="108" width="28" height="40" rx="6"/>
+    <rect x="188" y="96" width="20" height="64" rx="5"/>
+  </svg>`,
+  haltere: `<svg width="26" height="26" viewBox="0 0 256 256" fill="none" stroke="#5a9e6f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="88" y1="128" x2="168" y2="128"/>
+    <rect x="24" y="108" width="28" height="40" rx="8"/>
+    <rect x="52" y="96" width="20" height="64" rx="6"/>
+    <rect x="204" y="108" width="28" height="40" rx="8"/>
+    <rect x="184" y="96" width="20" height="64" rx="6"/>
+  </svg>`,
+  abdomen: `<svg width="26" height="26" viewBox="0 0 256 256" fill="none" stroke="#5a9e6f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="128" cy="40" r="22"/>
+    <path d="M96 62 L56 188"/>
+    <path d="M160 62 L200 188"/>
+    <path d="M56 188 L128 156 L200 188"/>
+    <path d="M76 228 L56 188"/>
+    <path d="M180 228 L200 188"/>
+  </svg>`,
+  triceps: `<svg width="26" height="26" viewBox="0 0 256 256" fill="none" stroke="#5a9e6f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="80" cy="40" r="22"/>
+    <path d="M80 62 L80 124 L184 124"/>
+    <path d="M144 100 L184 124 L144 148"/>
+    <path d="M80 124 L80 200"/>
+    <line x1="56" y1="200" x2="104" y2="200"/>
+  </svg>`,
+  panturrilha: `<svg width="26" height="26" viewBox="0 0 256 256" fill="none" stroke="#5a9e6f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 36 L80 160 Q80 204 124 212 L164 212"/>
+    <path d="M164 212 L164 232"/>
+    <line x1="140" y1="232" x2="188" y2="232"/>
+    <path d="M80 96 Q56 118 56 144 Q56 168 80 172"/>
+  </svg>`,
+  costas: `<svg width="26" height="26" viewBox="0 0 256 256" fill="none" stroke="#5a9e6f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="128" cy="40" r="22"/>
+    <path d="M76 78 L128 60 L180 78"/>
+    <path d="M76 78 L60 164 L128 144 L196 164 L180 78"/>
+    <path d="M128 144 L128 216"/>
+    <line x1="96" y1="216" x2="160" y2="216"/>
+  </svg>`,
+  ombro: `<svg width="26" height="26" viewBox="0 0 256 256" fill="none" stroke="#5a9e6f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="128" cy="44" r="22"/>
+    <path d="M128 66 L128 148"/>
+    <path d="M56 96 L128 76 L200 96"/>
+    <path d="M56 96 L28 140"/>
+    <path d="M200 96 L228 140"/>
+    <path d="M128 148 L96 216"/>
+    <path d="M128 148 L160 216"/>
+  </svg>`,
+  biceps: `<svg width="26" height="26" viewBox="0 0 256 256" fill="none" stroke="#5a9e6f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="128" cy="40" r="22"/>
+    <path d="M128 62 L128 132"/>
+    <path d="M128 132 Q84 132 72 168 Q60 200 100 212 L172 212"/>
+    <rect x="156" y="200" width="40" height="24" rx="8"/>
+  </svg>`
+};
+
+// ─── DADOS DOS TREINOS ────────────────────────────────────────
+const TREINOS = {
+  A: [
+    { cat: 'Pernas', nome: 'Cadeira extensora', det: '4 séries × 10-12 reps · carga 50', icon: 'perna', reps: 44 },
+    { cat: 'Pernas', nome: 'Cadeira flexora', det: '4 séries × 10-12 reps · carga 45', icon: 'perna', reps: 44 },
+    { cat: 'Pernas', nome: 'Agachamento com anilha', det: '4 séries × 10-12 reps · 20kg', icon: 'agacha', reps: 44 },
+    { cat: 'Peito', nome: 'Supino barra com pés apoiados', det: '4 séries × 10-12 reps · 15kg cada lado', icon: 'barra', reps: 44 },
+    { cat: 'Peito', nome: 'Peitoral FLY', det: '4 séries × 10-12 reps · 10kg cada lado', icon: 'haltere', reps: 44 },
+    { cat: 'Core · Tronco', nome: 'Flexão de tronco no banco 45°', det: '3 séries × 10-12 reps · 10kg', icon: 'abdomen', reps: 33 },
+    { cat: 'Tríceps', nome: 'Tríceps barra reta', det: '4 séries × 10-12 reps · carga 20', icon: 'triceps', reps: 44 },
+    { cat: 'Tríceps', nome: 'Tríceps supinado / barra V', det: '4 séries × 10-12 reps · carga 17', icon: 'triceps', reps: 44 },
+  ],
+  B: [
+    { cat: 'Panturrilha', nome: 'Panturrilha no leg sentado', det: '4 séries × 20 reps · carga 60', icon: 'panturrilha', reps: 80 },
+    { cat: 'Costas', nome: 'Puxada aberta', det: '4 séries × 10-12 reps · carga 40', icon: 'costas', reps: 44 },
+    { cat: 'Costas', nome: 'Remada baixa no triângulo', det: '4 séries × 10-12 reps · carga 25', icon: 'costas', reps: 44 },
+    { cat: 'Deltoide', nome: 'Máquina deltoide ombro', det: '4 séries × 10-12 reps · 20kg (banco alto)', icon: 'ombro', reps: 44 },
+    { cat: 'Deltoide', nome: 'Elevação lateral na parede', det: '4 séries × 10-12 reps · 6kg cada lado', icon: 'ombro', reps: 44 },
+    { cat: 'Bíceps', nome: 'Rosca barra W', det: '4 séries × 10-12 reps · 15kg', icon: 'biceps', reps: 44, rest: 'Respeitar descanso' },
+    { cat: 'Bíceps', nome: 'Rosca martelo', det: '4 séries × 10-12 reps · 9kg cada lado', icon: 'biceps', reps: 44, rest: 'Descanso 1min 30s' },
+    { cat: 'Abdômen', nome: 'Abdominal infra c/ caneleira', det: '3 séries × 15 reps · 3kg', icon: 'abdomen', reps: 45 },
+  ]
+};
+
+// ─── ESTADO ───────────────────────────────────────────────────
+let currentTreino = 'A';
+let doneList = [];
+
+// ─── STORAGE ──────────────────────────────────────────────────
+function getHistorico() { try { return JSON.parse(localStorage.getItem('academia_hist') || '[]'); } catch { return []; } }
+function saveHistorico(h) { localStorage.setItem('academia_hist', JSON.stringify(h)); }
+function getLastTreino() { const h = getHistorico(); return h.length ? h[h.length-1].tipo : null; }
+
+// ─── DATA ──────────────────────────────────────────────────────
+function formatDate(d) {
+  const dias = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  return `${dias[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()]} de ${d.getFullYear()}`;
+}
+
+// ─── HOME ─────────────────────────────────────────────────────
+function initHome() {
+  const now = new Date();
+  document.getElementById('home-date').textContent = formatDate(now);
+
+  const hist = getHistorico();
+  const mes = now.getMonth();
+  const ano = now.getFullYear();
+  const diasMes = hist.filter(t => { const d = new Date(t.data); return d.getMonth() === mes && d.getFullYear() === ano; }).length;
+  document.getElementById('dias-count').textContent = diasMes;
+
+  const last = getLastTreino();
+  const sugerido = last === 'A' ? 'B' : 'A';
+  document.getElementById('btn-a').classList.toggle('suggested', sugerido === 'A');
+  document.getElementById('btn-b').classList.toggle('suggested', sugerido === 'B');
+}
+
+function showHome() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('home').classList.add('active');
+  initHome();
+}
+
+// ─── CHECKLIST ────────────────────────────────────────────────
+function showChecklist(tipo) {
+  currentTreino = tipo;
+  doneList = new Array(TREINOS[tipo].length).fill(false);
+  document.getElementById('cl-title').textContent = 'Treino ' + tipo;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('checklist').classList.add('active');
+  renderCards();
+  updateProgress();
+}
+
+function toggleDone(i) {
+  doneList[i] = !doneList[i];
+  renderCards();
+  updateProgress();
+}
+
+function renderCards() {
+  const exs = TREINOS[currentTreino];
+  document.getElementById('exercise-list').innerHTML = exs.map((ex, i) => `
+    <div class="ex-card ${doneList[i] ? 'done' : ''}" onclick="toggleDone(${i})">
+      <div class="ex-num">${i+1}</div>
+      <div class="icon-wrap">${IC[ex.icon]}</div>
+      <div class="ex-info">
+        <div class="ex-cat">${ex.cat}</div>
+        <div class="ex-name">${ex.nome}</div>
+        <div class="ex-detail">${ex.det}</div>
+        ${ex.rest ? `<div class="ex-rest">⏱ ${ex.rest}</div>` : ''}
+      </div>
+      <div class="ex-check">${doneList[i] ? '✓' : ''}</div>
+    </div>
+  `).join('');
+}
+
+function updateProgress() {
+  const total = doneList.length;
+  const count = doneList.filter(Boolean).length;
+  const pct = Math.round(count / total * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-text').textContent = `${count} de ${total} exercícios`;
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('btn-concluir').classList.toggle('visible', count === total);
+}
+
+function concluirTreino() {
+  const exs = TREINOS[currentTreino];
+  const feitos = doneList.filter(Boolean).length;
+  const reps = exs.reduce((acc, ex, i) => acc + (doneList[i] ? ex.reps : 0), 0);
+  const hist = getHistorico();
+  hist.push({ tipo: currentTreino, data: new Date().toISOString(), exercicios: feitos, reps });
+  saveHistorico(hist);
+  showToast('Treino ' + currentTreino + ' concluído! 💪');
+  setTimeout(showHome, 1800);
+}
+
+// ─── ESTATÍSTICAS ─────────────────────────────────────────────
+function showStats() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('stats').classList.add('active');
+
+  const now = new Date();
+  const mes = now.getMonth();
+  const ano = now.getFullYear();
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('stats-title').textContent = `${meses[mes]} ${ano}`;
+
+  const hist = getHistorico();
+  const doMes = hist.filter(t => { const d = new Date(t.data); return d.getMonth() === mes && d.getFullYear() === ano; });
+
+  document.getElementById('s-dias').textContent = doMes.length;
+  document.getElementById('s-exs').textContent = doMes.reduce((a, t) => a + t.exercicios, 0);
+  document.getElementById('s-reps').textContent = doMes.reduce((a, t) => a + t.reps, 0);
+
+  // Semanas
+  const semanas = [0,0,0,0];
+  const semanasEx = [0,0,0,0];
+  doMes.forEach(t => {
+    const d = new Date(t.data);
+    const sem = Math.min(Math.floor((d.getDate()-1)/7), 3);
+    semanas[sem]++;
+    semanasEx[sem] += t.exercicios;
+  });
+  document.getElementById('semanas-body').innerHTML = semanas.map((s, i) => `
+    <tr><td>Semana ${i+1}</td><td>${s} treino${s!==1?'s':''}</td><td>${semanasEx[i]} exercícios</td></tr>
+  `).join('');
+
+  // Histórico
+  const recentes = [...hist].reverse().slice(0, 12);
+  if (!recentes.length) {
+    document.getElementById('historico').innerHTML = '<div class="empty-state">Nenhum treino registrado ainda</div>';
+  } else {
+    document.getElementById('historico').innerHTML = recentes.map(t => {
+      const d = new Date(t.data);
+      const dateStr = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+      return `<div class="hist-item">
+        <div>
+          <div class="hist-date">${dateStr}</div>
+        </div>
+        <div class="hist-badge">Treino ${t.tipo}</div>
+        <div class="hist-detail">${t.exercicios} exercícios<br>${t.reps} reps</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ─── TOAST ────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+initHome();
+</script>
+</body>
+</html>
